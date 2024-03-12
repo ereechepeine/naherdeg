@@ -46,14 +46,13 @@
             xhr.onload = event => {
                 patchResponse(xhr);
 
+                xhr.onload = realOnLoad;
                 if (realOnLoad) {
-                    xhr.onload = realOnLoad;
                     xhr.onload(event);
                 };
             };
 
             xhr.send = realSend;
-
             return xhr.send(data);
         };
 
