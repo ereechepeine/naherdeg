@@ -10,50 +10,73 @@
 // @run-at      document-start
 // ==/UserScript==
 
-// From https://github.com/GMEstonk/files/blob/main/xhr-redirect.js
+(function() {
+    'use strict';
 
-let rH = window.location.host.replace('.servleteer.com', '');
-if (!XMLHttpRequest.nativeOpen) {
-    XMLHttpRequest.prototype.nativeOpen = XMLHttpRequest.prototype.open;
+    function patchJson(xhr) {
+        if (xhr.responseText[0] === '{') {
+            try {
+                let json = JSON.parse(xhr.responseText);
 
-    XMLHttpRequest.prototype.customOpen = function (method, url, asynch, user, password) {
-        url = url.replaceAll(rH, window.location.host);
-        url = url.replace('gql.reddit.com/', 'gql.reddit.com.servleteer.com/');
-        url = url.replaceAll('.servleteer.com.servleteer.com', '.servleteer.com');
-        this.method = method;
-        this.requestURL = url;
-        this.asynch = asynch;
-        if (user) { this.user = user; }
-        if (password) { this.password = password; }
-        this.requestHeaders = new Map();
+                if (json.elections) {
+                    json.elections[0].maxChoices = json.elections[0].deputies.length;
 
-        return this.nativeOpen(method, url, asynch, user, password);
+                    return JSON.stringify(json);
+                }
+            }
+            catch (e) {
+                console.error(e);
+            }
+        }
 
+        return null;
     }
 
-    XMLHttpRequest.prototype.open = XMLHttpRequest.prototype.customOpen;
-
-
-
-    /*//////////////////////////////////////////////////////////////////////////*/
-
-
-    XMLHttpRequest.nativeOpen = XMLHttpRequest.open;
-
-    XMLHttpRequest.customOpen = function (method, url, asynch, user, password) {
-        url = url.replaceAll(rH, window.location.host);
-        url = url.replace('gql.reddit.com/', 'gql.reddit.com.servleteer.com/');
-        url = url.replaceAll('.servleteer.com.servleteer.com', '.servleteer.com');
-        this.method = method;
-        this.requestURL = url;
-        this.asynch = asynch;
-        if (user) { this.user = user; }
-        if (password) { this.password = password; }
-        this.requestHeaders = new Map();
-
-        return this.nativeOpen(method, url, asynch, user, password);
-
+    function patchXhr(xhr, patchedResponseText) {
+        return new Proxy(xhr, {
+            get(target, prop, receiver) {
+                if (prop === 'responseText') {
+                    return patchedResponseText;
+                }
+                return target[prop];
+            }
+        });
     }
 
-    XMLHttpRequest.open = XMLHttpRequest.customOpen;
-}
+    const XHR = unsafeWindow.XMLHttpRequest;
+
+    unsafeWindow.XMLHttpRequest = function() {
+        let xhr = new XHR();
+
+        const realSend = xhr.send;
+
+        xhr.send = function(data) {
+            let realOnLoad = xhr.onload;
+            let realOnLoadend = xhr.onloadend;
+
+            xhr.onload = function() {
+                console.log(this, xhr.responseText); // Here's your original response text
+
+                let patchedResponseText = patchJson(xhr);
+
+                let patchedXhr = xhr;
+
+                if (patchedResponseText !== null) {
+                    patchedXhr = patchXhr(xhr, patchedResponseText);
+                }
+
+                if (realOnLoad) {
+                    realOnLoad.apply(patchedXhr, arguments);
+                };
+
+                if (realOnLoadend) {
+                    realOnLoadend.apply(patchedXhr, arguments);
+                }
+            };
+
+            return realSend.apply(xhr, arguments);
+        };
+
+        return xhr;
+    };
+})();
