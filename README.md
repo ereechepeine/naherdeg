@@ -33,11 +33,11 @@ NaherDeg - это пользовательский скрипт (userscript), к
 
 ## Установка на Android в Firefox
 
-Я пока не стал писать, как это делается. Думаю пользователи Android и сами разберутся. Но если напишите инструкцию [сюда](https://github.com/ereechepeine/naherdeg/issues). Я её добавлю.
+Я пока не стал писать, как это делается. Думаю пользователи Android и сами разберутся. Но если напишите инструкцию [сюда](https://github.com/ereechepeine/naherdeg/issues) или сделаете PR. Я её добавлю.
 
 ## Установка на iOS в Firefox
 
-Если это возможно - напишите инструкцию [здесь](https://github.com/ereechepeine/naherdeg/issues). Я её сюда добавлю.
+Если это возможно - напишите инструкцию [здесь](https://github.com/ereechepeine/naherdeg/issues) или сделайте PR. Я её сюда добавлю.
 
 # Проблемы
 
