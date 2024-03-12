@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name        NaherDeg
+// @name        Ломаный ДЭГ
 // @namespace   NaherDeg
 // @match       *://*/*
 // @grant       none
 // @version     1.0
 // @author      Ere
-// @description 3/11/2024, 10:48:31 PM
+// @description Ставим в ДЭГ столько галок, сколько нужно
 // @licence     MIT
 // @run-at      document-start
 // ==/UserScript==
