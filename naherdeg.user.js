@@ -47,9 +47,9 @@
 
                 if (patchedResponseText !== null) {
                     Object.defineProperty(xhr, 'responseText', {
-                        writable: true
+                        value: patchedResponseText,
+                        writable: false
                     });
-                    xhr.responseText = patchedResponseText;
                 }
 
                 if (realOnLoad) {
