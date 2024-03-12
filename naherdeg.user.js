@@ -13,7 +13,7 @@
 (function() {
     'use strict';
 
-    function patchJson(xhr) {
+    function patchResponse(xhr) {
         if (xhr.responseText != '' && xhr.responseText[0] === '{') {
             try {
                 let json = JSON.parse(xhr.responseText);
@@ -21,15 +21,16 @@
                 if (json.elections && json.elections.length >= 1 && json.elections[0].maxChoices && json.elections[0].deputies) {
                     json.elections[0].maxChoices = json.elections[0].deputies.length;
 
-                    return JSON.stringify(json);
+                    Object.defineProperty(xhr, 'responseText', {
+                        value: JSON.stringify(json),
+                        writable: false
+                    });
                 }
             }
             catch (e) {
                 console.error(e);
             }
         }
-
-        return null;
     }
 
     const XHR = unsafeWindow.XMLHttpRequest;
@@ -43,14 +44,7 @@
             let realOnLoad = xhr.onload;
 
             xhr.onload = () => {
-                let patchedResponseText = patchJson(xhr);
-
-                if (patchedResponseText !== null) {
-                    Object.defineProperty(xhr, 'responseText', {
-                        value: patchedResponseText,
-                        writable: false
-                    });
-                }
+                patchResponse(xhr);
 
                 if (realOnLoad) {
                     realOnLoad.apply(xhr, arguments);
