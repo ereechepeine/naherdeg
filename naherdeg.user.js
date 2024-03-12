@@ -14,7 +14,7 @@
     'use strict';
 
     function patchJson(xhr) {
-        if (xhr.responseText[0] === '{') {
+        if (xhr.responseText != '' && xhr.responseText[0] === '{') {
             try {
                 let json = JSON.parse(xhr.responseText);
 
