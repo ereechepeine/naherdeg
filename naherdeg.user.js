@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        NaherDeg
 // @namespace   NaherDeg
-// @match       http://deg.zhizhin.xyz:8080/ballot/*/*
+// @match       *://*/*
 // @grant       none
 // @version     1.0
 // @author      Ere
@@ -18,7 +18,7 @@
             try {
                 let json = JSON.parse(xhr.responseText);
 
-                if (json.elections) {
+                if (json.elections && json.elections.length >= 1 && json.elections[0].maxChoices && json.elections[0].deputies) {
                     json.elections[0].maxChoices = json.elections[0].deputies.length;
 
                     return JSON.stringify(json);
@@ -30,17 +30,6 @@
         }
 
         return null;
-    }
-
-    function patchXhr(xhr, patchedResponseText) {
-        return new Proxy(xhr, {
-            get(target, prop, receiver) {
-                if (prop === 'responseText') {
-                    return patchedResponseText;
-                }
-                return target[prop];
-            }
-        });
     }
 
     const XHR = unsafeWindow.XMLHttpRequest;
@@ -59,18 +48,19 @@
 
                 let patchedResponseText = patchJson(xhr);
 
-                let patchedXhr = xhr;
-
                 if (patchedResponseText !== null) {
-                    patchedXhr = patchXhr(xhr, patchedResponseText);
+                    Object.defineProperty(xhr, 'responseText', {
+                        writable: true
+                    });
+                    xhr.responseText = patchedResponseText;
                 }
 
                 if (realOnLoad) {
-                    realOnLoad.apply(patchedXhr, arguments);
+                    realOnLoad.apply(xhr, arguments);
                 };
 
                 if (realOnLoadend) {
-                    realOnLoadend.apply(patchedXhr, arguments);
+                    realOnLoadend.apply(xhr, arguments);
                 }
             };
 
