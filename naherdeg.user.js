@@ -40,7 +40,7 @@
 
         const realSend = xhr.send;
 
-        xhr.send = (data) => {
+        xhr.send = data => {
             let realOnLoad = xhr.onload;
 
             xhr.onload = () => {
@@ -51,7 +51,9 @@
                 };
             };
 
-            return realSend.apply(xhr, arguments);
+            xhr.send = realSend;
+
+            return xhr.send(data);
         };
 
         return xhr;
