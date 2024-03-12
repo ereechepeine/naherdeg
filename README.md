@@ -36,4 +36,8 @@ NaherDeg - это пользовательский скрипт (userscript), к
 
 ## Установка на iOS в Firefox
 
-Если это возможно - напишите инструкцию. Я её сюда добавлю.
+Если это возможно - напишите инструкцию [здесь](https://github.com/ereechepeine/naherdeg/issues). Я её сюда добавлю.
+
+# Проблемы
+
+Пишите об этом [сюда](https://github.com/ereechepeine/naherdeg/issues).
