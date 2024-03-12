@@ -43,11 +43,12 @@
         xhr.send = data => {
             let realOnLoad = xhr.onload;
 
-            xhr.onload = () => {
+            xhr.onload = event => {
                 patchResponse(xhr);
 
                 if (realOnLoad) {
-                    realOnLoad.apply(xhr, arguments);
+                    xhr.onload = realOnLoad;
+                    xhr.onload(event);
                 };
             };
 
