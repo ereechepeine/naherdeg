@@ -39,13 +39,10 @@
 
         const realSend = xhr.send;
 
-        xhr.send = function(data) {
+        xhr.send = (data) => {
             let realOnLoad = xhr.onload;
-            let realOnLoadend = xhr.onloadend;
 
-            xhr.onload = function() {
-                console.log(this, xhr.responseText); // Here's your original response text
-
+            xhr.onload = () => {
                 let patchedResponseText = patchJson(xhr);
 
                 if (patchedResponseText !== null) {
@@ -58,10 +55,6 @@
                 if (realOnLoad) {
                     realOnLoad.apply(xhr, arguments);
                 };
-
-                if (realOnLoadend) {
-                    realOnLoadend.apply(xhr, arguments);
-                }
             };
 
             return realSend.apply(xhr, arguments);
